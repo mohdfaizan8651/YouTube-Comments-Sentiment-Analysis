@@ -37,22 +37,40 @@ wnl = WordNetLemmatizer()
 sia = SentimentIntensityAnalyzer()
 stop_words = stopwords.words('english')
 
+
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+
+
+
+
+
+
+
 def returnytcomments(url):
     data=[]
     
-    chrome_service = Service(executable_path=r'C:\Program Files\chromedriver\chromedriver.exe')
+    
 
-    # Initialize the Chrome WebDriver with the Service object
-    with webdriver.Chrome(service=chrome_service) as driver:
-        print("GO head")
-        wait = WebDriverWait(driver,15)
-        driver.get(url)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run in headless mode for server environments
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu") 
 
-        for item in range(5): 
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    # with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options):
+    print("GO head")
+    wait = WebDriverWait(driver,15)
+    driver.get(url)
+
+    for item in range(5): 
             wait.until(EC.visibility_of_element_located((By.TAG_NAME, "body"))).send_keys(Keys.END)
             time.sleep(2)
 
-        for comment in wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#content"))):
+    for comment in wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#content"))):
             data.append(comment.text)
 
     return data
